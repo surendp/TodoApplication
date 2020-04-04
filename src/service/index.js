@@ -1,32 +1,36 @@
-let database = {};
-
 const TodoService = {
-  getTodos: () => Object.values(database),
-
-  postTodo: todoText => {
-    const id = Object.values(database).length;
-  
-    // create new post
-    const newPost = {
-      id,
-      todo: todoText,
-    };
-  
-    // store in data base
-    database = {
-      ...database,
-      [id]: {
-        ...newPost,
-      },
-    };
-
-    return newPost;
+  getTodos: async dbClient => {
+    try{
+      const client = await dbClient;
+      const res = await client.query('SELECT * FROM todo_list');
+      return res.rows;
+    } catch (error) {
+      console.error("Failed to get todo list!!\n", error);
+    }
+    return undefined;
   },
 
-  deleteTodo: todoId => {
-    const todo = database[todoId];
-    delete database[todoId];
-    return todo;
+  postTodo: async (todoText, dbClient) => {  
+    try {
+      // create new post
+      const client = await dbClient;
+      const res = await client.query('INSERT INTO todo_list(todo) VALUES ($1) RETURNING *', [todoText]);
+      return res.rows[0];
+    } catch (error) {
+      console.error("Error from service (postTodo)", error);
+      return undefined;
+    }
+  },
+
+  deleteTodo: async (todoId, dbClient) => {
+    try{
+      const client = await dbClient;
+      const res = await client.query('DELETE FROM todo_list WHERE id = $1 RETURNING *', [todoId]);
+      return res.rows[0];
+    } catch (error) {
+      console.error("Error from service (deleteTodo)", error);
+      return undefined;
+    }
   },
 };
 

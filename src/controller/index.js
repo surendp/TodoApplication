@@ -1,8 +1,8 @@
 const TodoService = require('../service');
 
 const TodoController = {
-  getTodos: (req, res) => {
-    const todos = TodoService.getTodos();
+  getTodos: async (req, res, dbClient) => {
+    const todos = await TodoService.getTodos(dbClient);
 
     if (!todos) {
       return res.status(400).json({
@@ -19,7 +19,7 @@ const TodoController = {
     }).end();
   },
 
-  postTodo: (req, res) => {
+  postTodo: async (req, res, dbClient) => {
     try {
       if (!(req.body && req.body.todo)) {
         return res.status(400).json({
@@ -32,7 +32,7 @@ const TodoController = {
       // extract the text from request body and 
       // call the service to post the todo
       const { todo } = req.body;
-      const newTodo = TodoService.postTodo(todo);
+      const newTodo = await TodoService.postTodo(todo, dbClient);
 
       if (newTodo) {
         return res.status(200).json({
@@ -44,7 +44,7 @@ const TodoController = {
         });
       }
 
-      throw new Error("Failed creating the todo");
+      throw new Error();
     } catch (error) {
       return res.status(400).json({
         statusCode: 400,
@@ -54,12 +54,12 @@ const TodoController = {
     }
   },
 
-  deleteTodo: (req, res) => {
+  deleteTodo: async (req, res, dbClient) => {
     try{
       const { id } = req.params;
   
       if (id) {
-        const deletedTodo = TodoService.deleteTodo(id);
+        const deletedTodo = await TodoService.deleteTodo(id, dbClient);
     
         if (deletedTodo) {
           return res.status(200).json({
@@ -68,11 +68,11 @@ const TodoController = {
             data: {
               ...deletedTodo,
             },
-          });
+          }).end();
         }
       }
-
-      throw new Error("Unable to delete the todo!");
+  
+      throw new Error();
     } catch (error) {
       console.log(error);
 
