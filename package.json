@@ -2,9 +2,9 @@
   "name": "todobackend",
   "version": "1.0.0",
   "description": "To do application backend server",
-  "main": "app.js",
+  "main": "start.ts",
   "scripts": {
-    "start": "nodemon src/app.js",
+    "start": "nodemon src/start.ts",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "",

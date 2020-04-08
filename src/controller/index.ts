@@ -1,8 +1,14 @@
-const TodoService = require('../service');
+import TodoService from '../service';
 
-const TodoController = {
-  getTodos: async (req, res, dbClient) => {
-    const todos = await TodoService.getTodos(dbClient);
+class TodoController {
+  private todoService: TodoService;
+
+  constructor (todoService: TodoService) {
+    this.todoService = todoService;
+  }
+
+  async getTodos (req, res) {
+    const todos = await this.todoService.getTodos();
 
     if (!todos) {
       return res.status(400).json({
@@ -17,9 +23,9 @@ const TodoController = {
       message: "successfully retrived the list",
       data: todos,
     }).end();
-  },
+  }
 
-  postTodo: async (req, res, dbClient) => {
+  async postTodo (req, res) {
     try {
       if (!(req.body && req.body.todo)) {
         return res.status(400).json({
@@ -32,7 +38,7 @@ const TodoController = {
       // extract the text from request body and 
       // call the service to post the todo
       const { todo } = req.body;
-      const newTodo = await TodoService.postTodo(todo, dbClient);
+      const newTodo = await this.todoService.postTodo(todo);
 
       if (newTodo) {
         return res.status(200).json({
@@ -52,14 +58,14 @@ const TodoController = {
         error: ["Something went wrong"],
       }).end();
     }
-  },
+  }
 
-  deleteTodo: async (req, res, dbClient) => {
+  async deleteTodo (req, res) {
     try{
       const { id } = req.params;
   
       if (id) {
-        const deletedTodo = await TodoService.deleteTodo(id, dbClient);
+        const deletedTodo = await this.todoService.deleteTodo(id);
     
         if (deletedTodo) {
           return res.status(200).json({
@@ -82,7 +88,7 @@ const TodoController = {
         error: ["Something went wrong!! May be because of invalid id"],
       }).end();
     }
-  },
-};
+  }
+}
 
-module.exports = TodoController;
+export default TodoController;
