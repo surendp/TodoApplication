@@ -15,12 +15,12 @@ dotenv.config();
  * Initiate Database and establish Database connection
  */
 const databaseManager: DatabaseManager = new DatabaseManager();
-const client: Promise<any> = databaseManager.establishConnection();
+const connection: Promise<any> = databaseManager.establishConnection();
 
 /**
  * Setup application routes
  */
-const todoService: TodoService = new TodoService(client);
+const todoService: TodoService = new TodoService(connection);
 const todoController: TodoController = new TodoController(todoService);
 const setupRoutes: SetupRoutes = new SetupRoutes(todoController);
 
@@ -30,5 +30,7 @@ const setupRoutes: SetupRoutes = new SetupRoutes(todoController);
  */
 const applicationServer: ApplicationServer = new ApplicationServer();
 applicationServer.use('/', setupRoutes.getApplicationRouter());
-applicationServer.start(client);
+applicationServer.start(connection);
+
+
 

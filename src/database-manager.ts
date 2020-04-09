@@ -1,20 +1,26 @@
-import { Client } from 'pg';
+import { createConnection, Connection } from 'typeorm';
+import { Todo } from './entities/todo';
 
 class DatabaseManager {
-  private client: Client;
+  private options;
 
   constructor () {
-    this.client = new Client();
+    this.options = {
+      type: "postgres",
+      entities: [
+        Todo
+      ],
+      synchronize: true,
+      logging: false,
+    };
   }
 
-  public async establishConnection () {
+  public async establishConnection (): Promise<Connection | Error> {
     try {
-      const client = new Client();
-      await client.connect();
-      return client;
+      const connection: Connection = await createConnection(this.options);
+      return connection;
     } catch (error) {
-      console.error(error);
-      return null;
+      return Promise.reject(error);
     }
   }
 }

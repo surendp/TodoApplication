@@ -71,21 +71,22 @@ class TodoController {
           return res.status(200).json({
             statusCode: 200,
             message: `Successfully deleted the Todo with id ${id}`,
-            data: {
-              ...deletedTodo,
-            },
           }).end();
+        } else if (!deletedTodo) {
+            return res.status(400).json({
+              statusCode: 400,
+              message: "Failed to delete a todo",
+              error: [`Todo with id ${id} does not exists in the database!!`],
+            }).end();
+          }
         }
-      }
-  
-      throw new Error();
     } catch (error) {
       console.log(error);
 
       return res.status(400).json({
         statusCode: 400,
         message: "Failed to delete a todo",
-        error: ["Something went wrong!! May be because of invalid id"],
+        error: ["Something went wrong!!"],
       }).end();
     }
   }

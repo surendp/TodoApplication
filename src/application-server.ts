@@ -15,10 +15,11 @@ class ApplicationServer {
     this.app.use(express.json());
   }
 
-  start (dbClient: Promise<any>) {
-    dbClient
+  start (connection: Promise<any>) {
+    connection
       .then(() => {
-        console.log("Database connection successful!!");   
+        console.log("Database connection successful!!");
+
         this.app.listen(
           this.port,
           () => console.log(`ToDo backend application is running on port ${this.port}`)

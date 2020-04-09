@@ -1,27 +1,34 @@
-class TodoService {
-  private client: Promise<any>;
+import { Todo } from '../entities/todo';
 
-  constructor(client: Promise<any>) {
-    this.client = client;
+class TodoService {
+  private connection: Promise<any>;
+
+  constructor(connection: Promise<any>) {
+    this.connection = connection;
   }
 
   async getTodos () {
     try{
-      const client = await this.client;
-      const res = await client.query('SELECT * FROM todo_list');
-      return res.rows;
+      const connection = await this.connection;
+      const todoRepository = connection.getRepository(Todo);
+      const todoList = await todoRepository.find();
+      return todoList;
     } catch (error) {
       console.error("Failed to get todo list!!\n", error);
+      return undefined;
     }
-    return undefined;
   }
 
   async postTodo (todoText) {
     try {
       // create new post
-      const client = await this.client;
-      const res = await client.query('INSERT INTO todo_list(todo) VALUES ($1) RETURNING *', [todoText]);
-      return res.rows[0];
+      let newTodo: Todo = new Todo();
+      newTodo.todo = todoText;
+
+      const connection = await this.connection;
+      const todoRepository = connection.getRepository(Todo);
+      const savedTodo = await todoRepository.save(newTodo);
+      return savedTodo;
     } catch (error) {
       console.error("Error from service (postTodo)", error);
       return undefined;
@@ -30,12 +37,13 @@ class TodoService {
 
   async deleteTodo (todoId) {
     try{
-      const client = await this.client;
-      const res = await client.query('DELETE FROM todo_list WHERE id = $1 RETURNING *', [todoId]);
-      return res.rows[0];
+      const connection = await this.connection;
+      const todoRepository = connection.getRepository(Todo);
+      const deletedTodo = await todoRepository.delete(todoId);
+      return deletedTodo.affected;
     } catch (error) {
       console.error("Error from service (deleteTodo)", error);
-      return undefined;
+      return error;
     }
   }
 }
