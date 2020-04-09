@@ -1,4 +1,5 @@
 import * as dotenv from 'dotenv';
+import "reflect-metadata";
 import DatabaseManager from './database-manager';
 import ApplicationServer from './application-server';
 import TodoController from './controller';
